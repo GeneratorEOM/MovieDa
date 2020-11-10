@@ -1,12 +1,18 @@
 <template>
-  <h1>Detail = {{id}}</h1>
+<div>
+  <MovieDetail :id="id"/>
+</div>
 </template>
 
 <script>
+import MovieDetail from '@/components/movie/MovieDetail'
 export default {
+	components: {
+		MovieDetail
+	},
 	data() {
 		return {
-			id: this.$route.id
+			id: this.$route.params.id
 		}
 	}
 }

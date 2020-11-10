@@ -1,7 +1,9 @@
 <template>
   <v-app id="inspire">
     <Header />
-    <router-view/>
+    <v-main>     
+        <router-view />
+    </v-main>
     <Footer />
   </v-app>
 </template>
@@ -15,8 +17,6 @@ export default {
     Header,
     Footer
   },
-  data: () => ({
-
-  })
+  data: () => ({})
 };
 </script>

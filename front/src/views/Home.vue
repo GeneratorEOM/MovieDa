@@ -1,9 +1,10 @@
 <template>
+<div>
     <MovieList/>
+</div>
 </template>
 
 <script>
-// @ is an alias to /src
 import MovieList from '@/components/movie/MovieList'
 
 export default {

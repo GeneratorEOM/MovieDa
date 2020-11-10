@@ -1,34 +1,22 @@
 <template>
-  <div>
-    <v-main>
-      <v-container class="gray lighten-5">
-        <v-row>
-          <v-col v-for="movie in movies" :key="movie.id" cols="6" sm="4" md="4" lg="3" xl="2">
-            <router-link id="rl" :to="{name: 'Detail', params: {id: movie.id}}" exact>
-              <v-card
-                id="card"
-                class="pa-2"
-                elevation="2"
-                tile
-                height="350"
-                style="hover: red;"
-                hover
-              >
-                <v-img
-                  contain
-                  height="250"
-                  :src="'https://image.tmdb.org/t/p/original'+movie.poster_path"
-                ></v-img>
-                <v-card-title class="justify-center">{{movie.title}}</v-card-title>
-              </v-card>
-            </router-link>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
+<v-container class="gray lighten-5">
+    <v-row>
+      <v-col v-for="movie in movies" :key="movie.id" cols="6" sm="4" md="4" lg="4" xl="2">
+        <router-link id="rl" :to="{name: 'Detail', params: {id: movie.id}}" exact>
+          <v-card id="card" elevation="2" tile height="350">
+            <v-img
+              contain
+              height="250"
+              :src="'https://image.tmdb.org/t/p/original'+movie.poster_path"
+            ></v-img>
+            <v-card-title class="justify-center">{{movie.title}}</v-card-title>
+          </v-card>
+        </router-link>
+      </v-col>
+    </v-row>
 
     <pagination :pageCnt="pageCnt" :visibleCnt="visibleCnt" @changePage="changePage" />
-  </div>
+</v-container>
 </template>
 
 <script>
@@ -42,7 +30,7 @@ export default {
   data() {
     return {
       movies: [],
-      pageCnt: null,
+      pageCnt: 0,
       visibleCnt: 7
     };
   },
@@ -75,19 +63,8 @@ export default {
 #rl {
   text-decoration: none;
 }
-.router-link-active {
-  color: black;
-  background-color: black;
-  text-decoration: none;
-}
-
-.router-link-exact-active {
-  color: black;
-  background-color: black;
-  text-decoration: none;
-}
 #card {
-	text-decoration: none;
+  text-decoration: none;
 }
 #card:hover {
   background-color: lightgray;
