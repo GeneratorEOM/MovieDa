@@ -9,18 +9,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.movieda.mapper.BoardMapper;
+import com.movieda.mapper.MovieMapper;
 import com.movieda.mapper.UserMapper;
 
-// Spring MVC ������Ʈ�� ���õ� ������ �ϴ� Ŭ����
+// Spring MVC 占쏙옙占쏙옙占쏙옙트占쏙옙 占쏙옙占시듸옙 占쏙옙占쏙옙占쏙옙 占싹댐옙 클占쏙옙占쏙옙
 @Configuration
-// Controller ������̼��� ���õǾ��ִ� Ŭ������ Controller�� ����Ѵ�.
+// Controller 占쏙옙占쏙옙占쏙옙抉占쏙옙占� 占쏙옙占시되억옙占쌍댐옙 클占쏙옙占쏙옙占쏙옙 Controller占쏙옙 占쏙옙占쏙옙磯占�.
 @EnableWebMvc
-// ��ĵ�� ��Ű���� �����Ѵ�.
+// 占쏙옙캔占쏙옙 占쏙옙키占쏙옙占쏙옙 占쏙옙占쏙옙占싼댐옙.
 @ComponentScan("com.movieda.controller")
 @ComponentScan("com.movieda.service")
 @ComponentScan("com.movieda.dao")
@@ -40,7 +43,7 @@ public class ServletAppContext implements WebMvcConfigurer {
 	@Value("${db.password}")
 	private String db_password;
 	
-	// Controller�� �޼��尡 ��ȯ�ϴ� jsp�� �̸� �յڿ� ��ο� Ȯ���ڸ� �����ֵ��� �����Ѵ�.
+	// Controller占쏙옙 占쌨쇽옙占썲가 占쏙옙환占싹댐옙 jsp占쏙옙 占싱몌옙 占쌌뒤울옙 占쏙옙恝占� 확占쏙옙占쌘몌옙 占쏙옙占쏙옙占쌍듸옙占쏙옙 占쏙옙占쏙옙占싼댐옙.
 	@Override
 	public void configureViewResolvers(ViewResolverRegistry registry) {
 		// TODO Auto-generated method stub
@@ -48,7 +51,7 @@ public class ServletAppContext implements WebMvcConfigurer {
 //		registry.jsp("/WEB-INF/views/", ".jsp");
 	}
 
-	// ���������� ��θ� �����Ѵ�.
+	// 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙 占쏙옙罐占� 占쏙옙占쏙옙占싼댐옙.
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		// TODO Auto-generated method stub
@@ -57,7 +60,7 @@ public class ServletAppContext implements WebMvcConfigurer {
 		registry.addResourceHandler("/**").addResourceLocations("/WEB-INF/views/");
 	}
 	
-	// MyBatis 설정
+	// MyBatis �ㅼ��
 	@Bean
 	public BasicDataSource dataSource() {
 		BasicDataSource source = new BasicDataSource();
@@ -68,7 +71,7 @@ public class ServletAppContext implements WebMvcConfigurer {
 		return source;
 	}
 	
-	// 쿼리문과 접속정보를 관리하는 객체
+	// 荑쇰━臾멸낵 ������蹂대�� 愿�由ы���� 媛�泥�
 	@Bean
 	public SqlSessionFactory factory(BasicDataSource source) throws Exception {
 		SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
@@ -77,11 +80,35 @@ public class ServletAppContext implements WebMvcConfigurer {
 		return factory;
 	}
 	
-	// 쿼리문 실행을 위한 객체 ( Mapper 관리 객체 )
+	// UserMapper 객체 등록
 	@Bean
 	public MapperFactoryBean<UserMapper> getUserMapper(SqlSessionFactory factory) throws Exception {
 		MapperFactoryBean<UserMapper> factoryBean = new MapperFactoryBean<UserMapper>(UserMapper.class);
 		factoryBean.setSqlSessionFactory(factory);
 		return factoryBean;
 	}
+	
+	// MovieMapper 객체 등록
+	@Bean
+	public MapperFactoryBean<MovieMapper> getMovieMapper(SqlSessionFactory factory) throws Exception {
+		MapperFactoryBean<MovieMapper> factoryBean = new MapperFactoryBean<MovieMapper>(MovieMapper.class);
+		factoryBean.setSqlSessionFactory(factory);
+		return factoryBean;
+	}
+	
+	// BoardMapper 객체 등록
+	@Bean
+	public MapperFactoryBean<BoardMapper> getBoardMapper(SqlSessionFactory factory) throws Exception {
+		MapperFactoryBean<BoardMapper> factoryBean = new MapperFactoryBean<BoardMapper>(BoardMapper.class);
+		factoryBean.setSqlSessionFactory(factory);
+		return factoryBean;
+	}
+	
+	// 파일 처리를 위한 객체
+	@Bean
+	public StandardServletMultipartResolver multipartResolver() {
+		return new StandardServletMultipartResolver();
+	}
+	
+	
 }

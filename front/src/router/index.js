@@ -27,35 +27,57 @@ const onlyAuthUser = (to, from, next) => {
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue')
+    path: '/movie/list',
+    name: 'MovieList',
+    component: () => import(/* webpackChunkName: "about" */ '../views/movie/MovieList.vue')
   },
   {
-    path: '/:id/detail',
-    name: 'Detail',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Detail.vue')
+    path: '/movie/:id',
+    name: 'MovieDetail',
+    component: () => import(/* webpackChunkName: "about" */ '../views/movie/MovieDetail.vue')
   },
   {
-    path: '/about',
-    name: 'About',
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  },
-  {
-    path: '/login',
-    name: 'Login',
+    path: '/user/login',
+    name: 'UserLogin',
     beforeEnter: rejectAuthUser,
-    component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/user/UserLogin.vue')
   },
   {
-    path: '/mypage',
-    name: 'MyPage',
+    path: '/user/mypage',
+    name: 'UserMypage',
     beforeEnter: onlyAuthUser,
-    component: () => import(/* webpackChunkName: "about" */ '../views/MyPage.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/user/UserMypage.vue')
+  },
+  {
+    path: '/user/join',
+    name: 'UserJoin',
+    component: () => import(/* webpackChunkName: "about" */ '../views/user/UserJoin.vue')
+  },
+  {
+    path: '/board/list',
+    name: 'BoardList',
+    component: () => import(/* webpackChunkName: "about" */ '../views/board/BoardList.vue')
+  },
+  {
+    path: '/board/:idx',
+    name: 'BoardDetail',
+    component: () => import(/* webpackChunkName: "about" */ '../views/board/BoardDetail.vue')
+  },
+  {
+    path: '/board/write',
+    name: 'BoardWrite',
+    beforeEnter: onlyAuthUser,
+    component: () => import(/* webpackChunkName: "about" */ '../views/board/BoardWrite.vue')
+  },
+  {
+    path: '/board/modify',
+    name: 'BoardModify',
+    beforeEnter: onlyAuthUser,
+    component: () => import(/* webpackChunkName: "about" */ '../views/board/BoardModify.vue')
   },
   {
     path: '/*',
-    redirect: { name: 'Home' }
+    redirect: { name: 'MovieList' }
   }
 ]
 

@@ -10,55 +10,94 @@ export default new Vuex.Store({
     userInfo: null,
     isLogin: false,
     isLoginError: false,
+    isEmailError: false,
+
+    movies: [],
+    pageCnt: 0,
+    visibleCnt: 7,
+
+    movieInfo: [],
+
+    reviews: [],
+    rating: 3
+
   },
   mutations: {
-    // 로그인이 성공했을 때,
+    // 로그인이 성공했을 때
     loginSuccess(state, payload) {
       state.isLogin = true
       state.isLoginError = false
       state.userInfo = payload
     },
-    // 로그인이 실패했을 때,
+    // 로그인이 실패했을 때
     loginError(state) {
       state.isLogin = false
       state.isLoginError = true
     },
+    // 로그아웃 했을 때
     logout(state) {
       state.isLogin = false
       state.isLoginError = false
       state.userInfo = null
-    }
+    },
+    // 유저정보 수정 할 때
+    modifyUserInfo(state) {
+      state.userInfo
+    },
+    // 회원가입 실패 - 아이디 중복
+    joinEmailError(state) {
+      state.isEmailError = true
+    },
+    // 메인 페이지 생성될 때   
+    getMovieList(state, payload) {
+      state.movies = payload.movies
+      state.pageCnt = payload.pageCnt
+    },
+    // 영화정보 가져오기
+    getMovieInfo(state, payload) {
+      state.movieInfo = payload
+    },
+    // 리뷰 가져오기
+    getReviewList(state, payload) {
+      state.reviews = payload
+      state.reviews = state.reviews.map(review => ({
+        ...review,
+        isActive: false,
+        modifyContent: review.review_content,
+        modifyRating: review.review_rating
+      }));
+    },
+
 
   },
   actions: {
-
+    // 로그인 액션
     login({ commit }, loginObj) {
       // Login.vue 에서 가져온 loginObj 를 파라미터로 서버에 전송
       // 토큰을 이용하여 로그인 처리를 해야 하지만 그건 나중에 ..... 
-      let config = {     
-          email: loginObj.email,
-          password: loginObj.password    
+      let config = {
+        user_email: loginObj.email,
+        user_password: loginObj.password
       }
       // axios.post 사용해서 서버로 post 방식 요청 content-type: json
-      axios.post('http://localhost:8080/api/login', config)
+      axios.post('http://localhost:8080/api/user/login', config)
         .then(res => {
-          console.log(res)
           // 아이디, 비번이 일치하지 않는다면 서버에서 0 을 리턴
           if (res.data === "") {
             commit('loginError')
-          }else { 
+          } else {
             let userInfo = {
-              idx: res.data.idx,
-              email: res.data.email,
-              password: res.data.password,
-              name: res.data.name,
-              gender: res.data.gender
-            }  
+              idx: res.data.user_idx,
+              email: res.data.user_email,
+              password: res.data.user_password,
+              name: res.data.user_name,
+              gender: res.data.user_gender
+            }
             commit('loginSuccess', userInfo)
             sessionStorage.setItem("token", res.data)
             // 로그인 처리 후 홈으로 이동
             router.push({
-              name: 'Home'
+              name: 'MovieList'
             })
           }
 
@@ -68,7 +107,7 @@ export default new Vuex.Store({
           console.log(err)
         })
     },
-
+    // 로그아웃 액션
     logout({ commit }) {
       // 로그아웃
       commit('logout')
@@ -76,13 +115,13 @@ export default new Vuex.Store({
       sessionStorage.removeItem("token")
       // 홈 이동
       router.push({
-        name: 'Home'
+        name: 'MovieList'
       })
     },
     // 새로고침할때 로그인 유지하기   
-    loginCheck({commit}) {
+    loginCheck({ commit }) {
       // 세션에 있는 토큰 저장
-      let email = sessionStorage.getItem('token') 
+      let email = sessionStorage.getItem('token')
       // 토큰이 존재하면 로그인 됨
       // 로그인 처리
       let config = {
@@ -90,26 +129,154 @@ export default new Vuex.Store({
           "token": email
         }
       }
-      if(email != null) {
-        axios.get('http://localhost:8080/api/user', config)
+      if (email != null) {
+        axios.get('http://localhost:8080/api/user/info', config)
           .then(res => {
-            console.log(res)      
+            console.log(res)
             let userInfo = {
-              idx: res.data.idx,
-              email: res.data.email,
-              password: res.data.password,
-              name: res.data.name,
-              gender: res.data.gender
+              idx: res.data.user_idx,
+              email: res.data.user_email,
+              password: res.data.user_password,
+              name: res.data.user_name,
+              gender: res.data.user_gender
             }
-            
+
             commit('loginSuccess', userInfo)
           })
           .catch(err => {
             console.log(err)
           })
       }
+    },
+    // 회원가입 액션
+    join({ commit }, joinObj) {
+      let config = {
+        user_email: joinObj.email,
+        user_password: joinObj.password,
+        user_name: joinObj.name,
+        user_gender: joinObj.gender
+      }
+      axios.post('http://localhost:8080/api/user/join', config)
+        .then(res => {
+          if (res.data === 'true') router.push({ name: 'UserLogin' })
+          else commit('joinEmailError')
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    // 회원정보 수정 액션
+    modifyUserInfo(context, modifyUserObj) {
+      let config = {
+        user_email: modifyUserObj.email,
+        user_password: modifyUserObj.password,
+        user_name: modifyUserObj.name,
+        user_gender: modifyUserObj.gender
+      }
+      axios.put('http://localhost:8080/api/user/modify', config)
+        .then(res => {
+          if (res.data === 1) router.push({ name: 'MovieList' })
+          else alert("수정 실패")
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    // 회원정보 삭제 액션
+    deleteUserInfo({ dispatch }, deleteUserObj) {
+      axios.delete('http://localhost:8080/api/user/delete', { params: { email: deleteUserObj.email } })
+        .then(res => {
+          if (res.data === 'true') dispatch('logout')
+          else alert("삭제 실패")
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    // 메인 영화리스트 가져오기
+    getMovieList({ commit }, pageNum) {
+      axios
+        .get(
+          "https://api.themoviedb.org/3/discover/movie?api_key=4738775b2c15a47761f19db1576589c8&language=ko-KR&sort_by=popularity.desc&include_adult=false&include_video=false&page=" +
+          pageNum
+        )
+        .then(res => {
+          commit('getMovieList', {
+            movies: res.data.results,
+            pageCnt: res.data.total_pages
+          })
+        });
+    },
+    // 영화정보 가져오기
+    getMoiveInfo({ commit }, movie_id) {
+      axios
+        .get(
+          "https://api.themoviedb.org/3/movie/" +
+          movie_id +
+          "?api_key=4738775b2c15a47761f19db1576589c8" +
+          "&language=ko-KR"
+        )
+        .then(res => {
+          commit('getMovieInfo', res.data)
+        });
+    },
+    // 리뷰 가져오기
+    getReviewList({ commit }, movie_id) {
+      axios.get('http://localhost:8080/api/movie/review/list', { params: { review_movie_id: movie_id } })
+        .then(res => {
+          commit('getReviewList', res.data)
+        })
+    },
+    // 리뷰 작성하기
+    writeReview({ dispatch }, reviewObj) {
+      let config = {
+        review_movie_id: reviewObj.review_movie_id,
+        review_user_idx: reviewObj.review_user_idx,
+        review_content: reviewObj.review_content,
+        review_rating: reviewObj.review_rating
+      }
+      axios
+        .post('http://localhost:8080/api/movie/review/write', config)
+        .then(res => {
+          if (res.status === 200) dispatch('getReviewList', reviewObj.movie_id)
+        })
+    },
+    // 리뷰에서 수정폼을 위한 토글 메서드, 클릭하면 폼 toggle
+    isActiveToggle(context, review) {
+      review.isActive = !review.isActive
+      review.modifyContent = ""
+    },
+
+    // 리뷰 수정하기
+    modifyReview({ dispatch }, reviewObj) {
+
+      if (reviewObj.modifyContent.trim() === "" || reviewObj.modifyContent === null) {
+        reviewObj.modifyContent = null
+        return false
+      }
+
+      let config = {
+        review_idx: reviewObj.review_idx,
+        review_content: reviewObj.modifyContent,
+        review_rating: reviewObj.modifyRating
+      }
+      axios
+        .put('http://localhost:8080/api/movie/review/modify', config)
+        .then(res => {
+          if (res.status === 200) {
+            dispatch('getReviewList', reviewObj.review_movie_id)
+            dispatch('isActiveToggle', reviewObj)
+          }
+        })
+    },
+    // 리뷰 삭제하기
+    deleteReview({dispatch}, reviewObj) {
+      axios.delete('http://localhost:8080/api/movie/review/delete', { params: { review_idx: reviewObj.review_idx } })
+        .then(res => {
+          if (res.status === 200)  dispatch('getReviewList', reviewObj.review_movie_id)
+        })
+      }
+    },
+    modules: {
     }
-  },
-  modules: {
-  }
-})
+  })

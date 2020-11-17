@@ -3,8 +3,8 @@ package com.movieda.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.movieda.beans.UserBean;
 import com.movieda.mapper.UserMapper;
-import com.myweb.beans.UserBean;
 
 @Repository
 public class UserDAO {
@@ -17,6 +17,18 @@ public class UserDAO {
 	}
 	public UserBean getMyPageUserInfo(String token) {
 		return userMapper.getMyPageUserInfo(token);
+	}
+	public int addUserInfo(UserBean userBean) {
+		return userMapper.addUserInfo(userBean);
+	}
+	public String checkUserEmailExist(String email) {
+		return userMapper.checkUserEmailExist(email);
+	}
+	public int modifyUserInfo(UserBean userBean) {
+		return userMapper.modifyUserInfo(userBean);
+	}
+	public int deleteUserInfo(String email) {
+		return userMapper.deleteUserInfo(email);
 	}
 
 }
