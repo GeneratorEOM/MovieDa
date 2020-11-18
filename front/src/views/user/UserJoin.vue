@@ -1,5 +1,7 @@
 <template>
-  <v-container class="mt-10" style="max-width: 500px">
+  <v-container fill-height class="mt-10" style="max-width: 500px">
+    <v-layout align-center>
+      <v-flex>
     <v-alert class="mb-3" type="error" :value="isEmailError">이메일이 중복되었습니다</v-alert>
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-text-field v-model="email" :rules="emailRules" label="이메일" required></v-text-field>
@@ -26,6 +28,8 @@
 
       <v-btn color="error" router :to="{name: 'MovieList'}">취소</v-btn>
     </v-form>
+    </v-flex>
+      </v-layout>
   </v-container>
 </template>
 

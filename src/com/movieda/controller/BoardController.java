@@ -72,7 +72,6 @@ public class BoardController {
 
 	@PutMapping("/modify")
 	public void modify(BoardBean boardBean) {
-		System.out.println("content: " + boardBean.getBoard_content());
 		boardService.modifyBoard(boardBean);
 	}
 

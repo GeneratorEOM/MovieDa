@@ -1,5 +1,7 @@
 <template>
-  <v-container max-width="800">
+  <v-container mt-10 max-width="800">
+    <v-layout align-center>
+      <v-flex>
     <v-simple-table>
       <template v-slot:default>
         <thead>
@@ -15,7 +17,7 @@
             style="text-align: center;"
             v-for="board in boards"
             :key="board.board_idx"
-            @click="detail(board.board_idx)"
+            @click="boardDetail(board.board_idx)"
           >
             <td>{{ board.board_idx }}</td>
             <td>{{ board.board_subject }}</td>
@@ -26,71 +28,43 @@
       </template>
     </v-simple-table>
     <div class="text-center mt-5 mb-5">
-      <v-pagination v-model="page" :length="pageCnt" :total-visible="7" @input="getBoardList"></v-pagination>
+      <pagination :pageCnt="pageCnt" :visibleCnt="visibleCnt" @change="getBoardList" />
     </div>
     <v-btn router :to="{name: 'BoardWrite'}">글쓰기</v-btn>
+    </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
 <script>
-import axios from "axios";
+import Pagination from "@/components/Pagination"
+import {mapState, mapActions} from 'vuex'
 export default {
+  components: {
+    Pagination
+  },
   data() {
-    return {
-      boards: [],
-      page: 1,
-      pageCnt: null
-    };
+    return {}
+  },
+  computed: {
+    ...mapState(['boards', 'pageCnt', 'visibleCnt'])
   },
   created() {
-    axios
-      .get("http://localhost:8080/api/board/list", {
-        params: { page: this.page }
-      })
-      .then(res => {
-        console.log(res);
-        this.boards = res.data.boardList
-       
-        this.pageCnt = res.data.pageBean.pageCnt;
-      })
-      .catch(err => {
-        alert("ERROR" + err);
-      });
+    this.getBoardList(1)
   },
   methods: {
-    getBoardList() {
-      axios
-        .get("http://localhost:8080/api/board/list", {
-          params: { page: this.page }
-        })
-        .then(res => {
-          console.log(res);
-          this.boards = res.data.boardList;
-          this.pageCnt = res.data.pageBean.pageCnt;
-        })
-        .catch(err => {
-          alert("ERROR" + err);
-        });
-    },
-    write() {
-      axios
-        .post("http://localhost:8080/api/board/write")
-        .then(res => {
-          console.log(res);
-          this.boards = res.data;
-        })
-        .catch(err => {
-          alert("ERROR" + err);
-        });
-    },
-    detail(idx) {
+
+    ...mapActions(["getBoardList"]),
+
+    boardDetail(board_idx) {
       this.$router.push({
-        name: "BoardDetail",
+        name: 'BoardDetail',
         params: {
-          idx: idx
+          idx: board_idx
         }
-      });
+      })
     }
+
   }
 };
 </script>

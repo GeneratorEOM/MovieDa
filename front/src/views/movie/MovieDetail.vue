@@ -44,7 +44,7 @@
         
       </div>
       <v-divider></v-divider>
-      <Review :movie_id="movie_id" />
+      <MovieReview :movie_id="movie_id" />
     </v-card>
   </v-container>
 </template>

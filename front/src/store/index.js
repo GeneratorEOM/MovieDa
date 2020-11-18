@@ -19,7 +19,13 @@ export default new Vuex.Store({
     movieInfo: [],
 
     reviews: [],
-    rating: 3
+    rating: 3,
+
+    boards: [],
+    boardInfo: [],
+    file: null,
+
+    comments: []
 
   },
   mutations: {
@@ -67,12 +73,35 @@ export default new Vuex.Store({
         modifyRating: review.review_rating
       }));
     },
+    // 게시판 리스트 가져오기
+    getBoardList(state, payload) {
+      state.boards = payload.boards
+      state.pageCnt = payload.pageCnt
+    },
+    // 게시판 글 가져오기
+    getBoardInfo(state, payload) {
+      state.boardInfo = payload
+    },
+    // 파일 변경
+    changeFile(state, payload) {
+      state.file = payload
+    },
+    // 댓글 리스트 가져오기
+    getCommentList(state, payload) {
+      state.comments = payload
+      state.comments = state.comments.map(comment => ({
+        ...comment,
+        isActive: false,
+        modifyContent : comment.comment_content
+      }));
+    }
 
 
   },
   actions: {
     // 로그인 액션
     login({ commit }, loginObj) {
+      
       // Login.vue 에서 가져온 loginObj 를 파라미터로 서버에 전송
       // 토큰을 이용하여 로그인 처리를 해야 하지만 그건 나중에 ..... 
       let config = {
@@ -132,7 +161,7 @@ export default new Vuex.Store({
       if (email != null) {
         axios.get('http://localhost:8080/api/user/info', config)
           .then(res => {
-            console.log(res)
+          if (res.status === 200) {
             let userInfo = {
               idx: res.data.user_idx,
               email: res.data.user_email,
@@ -140,8 +169,8 @@ export default new Vuex.Store({
               name: res.data.user_name,
               gender: res.data.user_gender
             }
-
             commit('loginSuccess', userInfo)
+            }
           })
           .catch(err => {
             console.log(err)
@@ -175,7 +204,7 @@ export default new Vuex.Store({
       }
       axios.put('http://localhost:8080/api/user/modify', config)
         .then(res => {
-          if (res.data === 1) router.push({ name: 'MovieList' })
+          if (res.status === 200) router.push({ name: 'MovieList' })
           else alert("수정 실패")
         })
         .catch(err => {
@@ -201,7 +230,7 @@ export default new Vuex.Store({
           pageNum
         )
         .then(res => {
-          commit('getMovieList', {
+          if (res.status === 200) commit('getMovieList', {
             movies: res.data.results,
             pageCnt: res.data.total_pages
           })
@@ -217,14 +246,14 @@ export default new Vuex.Store({
           "&language=ko-KR"
         )
         .then(res => {
-          commit('getMovieInfo', res.data)
+          if (res.status === 200) commit('getMovieInfo', res.data)
         });
     },
     // 리뷰 가져오기
     getReviewList({ commit }, movie_id) {
       axios.get('http://localhost:8080/api/movie/review/list', { params: { review_movie_id: movie_id } })
         .then(res => {
-          commit('getReviewList', res.data)
+          if (res.status === 200) commit('getReviewList', res.data)
         })
     },
     // 리뷰 작성하기
@@ -263,7 +292,7 @@ export default new Vuex.Store({
       axios
         .put('http://localhost:8080/api/movie/review/modify', config)
         .then(res => {
-          if (res.status === 200) {
+          if(res.status === 200) {
             dispatch('getReviewList', reviewObj.review_movie_id)
             dispatch('isActiveToggle', reviewObj)
           }
@@ -273,10 +302,151 @@ export default new Vuex.Store({
     deleteReview({dispatch}, reviewObj) {
       axios.delete('http://localhost:8080/api/movie/review/delete', { params: { review_idx: reviewObj.review_idx } })
         .then(res => {
-          if (res.status === 200)  dispatch('getReviewList', reviewObj.review_movie_id)
+          if(res.status === 200) dispatch('getReviewList', reviewObj.review_movie_id)
         })
-      }
     },
-    modules: {
+    // 게시판 리스트 가져오기
+    getBoardList({commit}, pageNum) {
+      axios
+        .get("http://localhost:8080/api/board/list", {
+          params: { page: pageNum }
+        })
+        .then(res => {
+          if (res.status === 200) commit('getBoardList', {
+            boards: res.data.boardList,
+            pageCnt: res.data.pageBean.pageCnt
+          })
+        })
+    },
+
+    // 글쓰기
+    writeBoard(context, boardObj) {
+      // 입력 내용을 폼 객체로 전송
+      var config = new FormData();
+      config.append("board_user_idx", boardObj.idx);
+      config.append("board_subject", boardObj.subject);
+      config.append("board_content", boardObj.content);
+      config.append("upload_file", boardObj.file);
+
+      axios
+        .post("http://localhost:8080/api/board/write", config, {
+          headers: { "Content-Type": "multipart/form-data" }
+        })
+        .then(res => {        
+          if (res.status === 200) router.push({ name: "BoardList" });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    // 게시판 글 가져오기
+    getBoardInfo({commit}, board_idx) {
+      axios
+      .get("http://localhost:8080/api/board/detail", {
+        params: { board_idx: board_idx }
+      })
+      .then(res => {
+        if (res.status === 200) commit('getBoardInfo', res.data)
+      })
+    },
+    // 게시판 글 삭제하기
+    deleteBoardInfo() {
+      axios
+      .delete("http://localhost:8080/api/board/delete", {
+        params: { board_idx: this.idx }
+      })
+      .then(res => {
+        if(res.status === 200) this.$router.push({name: 'BoardList'})
+      })  
+    },
+    // 게시판 글 수정하기
+    modifyBoardInfo(context, boardInfo) {
+      // 입력 내용을 폼 객체로 전송
+      var config = new FormData();
+      config.append("board_idx", boardInfo.idx);
+      config.append("board_subject", boardInfo.subject);
+      config.append("board_content", boardInfo.content);
+      config.append("upload_file", boardInfo.file);
+
+      axios
+        .put("http://localhost:8080/api/board/modify", config, {
+          headers: { "Content-Type": "multipart/form-data" }
+        })
+        .then(res => {
+          if (res.status === 200) {
+              router.push({
+              name: "BoardDetail",
+              params: {
+              idx: boardInfo.idx
+            }
+          });
+        }
+      })
+    },
+    // 입력되는 파일의 정보를 파일 변수에 저장
+    changeFile({commit}, file) {
+      commit('changeFile', file)
+    },
+    // 댓글 리스트 가져오기 
+    getCommentList({commit}, board_idx) {
+      axios
+        .get("http://localhost:8080/api/board/comment/list", {
+          params: { board_idx: board_idx }
+        })
+        .then(res => {
+          if (res.status === 200) commit('getCommentList', res.data)
+        })  
+    },
+    writeComment({dispatch}, commentObj) {
+      // 데이터 담아서
+      let config = {
+        comment_content: commentObj.content,
+        comment_board_idx: commentObj.board_idx,
+        comment_user_idx: commentObj.user_idx
+      };
+      axios
+        .post("http://localhost:8080/api/board/comment/write", config)
+        .then(res => {
+          if (res.status === 200) dispatch('getCommentList', commentObj.comment_board_idx)
+        })
+    },
+    // 댓글 수정하기
+    modifyCommentInfo({dispatch}, commentObj) {
+      // 각 댓글마다 폼 validate를 사용할 방법을 모르겠음
+      // 공백이면 null 값을 넣어서 강제로 유효성 검사 하게함 
+      if(commentObj.modifyContent.trim() == "" || commentObj.modifyContent == null) {
+        commentObj.modifyContent = null
+        return false    
+      }
+      // 수정할 데이터 담아서
+      let config = {
+        comment_idx: commentObj.comment_idx,
+        comment_content: commentObj.modifyContent
+      };
+      axios
+        .put("http://localhost:8080/api/board/comment/modify", config)
+        .then(res => {
+          if (res.status === 200) {
+            // 리스트 다시 불러오기
+            dispatch("getCommentList", commentObj.comment_board_idx)
+            // 수정 폼 닫기
+            dispatch("isActiveToggle", commentObj)
+          }
+        })
+    },
+    // 댓글 삭제
+    deleteCommentInfo({dispatch}, comment) {
+      alert(comment.comment_board_idx)
+      axios
+        .delete("http://localhost:8080/api/board/comment/delete", {
+          params: { comment_idx: comment.comment_idx }
+        })
+        .then(res => {
+          if (res.status === 200) dispatch("getCommentList", comment.comment_board_idx)
+        })
     }
-  })
+  },
+  modules: {
+    
+  }
+})

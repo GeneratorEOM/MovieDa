@@ -1,5 +1,7 @@
 <template>
-  <v-container class="mt-10" style="max-width: 500px">
+  <v-container fill-height class="mt-10" style="max-width: 500px">
+    <v-layout align-center>
+      <v-flex>
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-text-field v-model="userInfo.email" :rules="emailRules" label="이메일" required readonly></v-text-field>
 
@@ -33,6 +35,8 @@
 
       <v-btn color="error" router :to="{name: 'MovieList'}">취소</v-btn>
     </v-form>
+    </v-flex>
+    </v-layout>
   </v-container>
 </template>
 <script>
