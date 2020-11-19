@@ -51,16 +51,16 @@ public class ServletAppContext implements WebMvcConfigurer {
 //		registry.jsp("/WEB-INF/views/", ".jsp");
 	}
 
-	// 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙 占쏙옙罐占� 占쏙옙占쏙옙占싼댐옙.
+	// 정적파일 매핑
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		// TODO Auto-generated method stub
 		WebMvcConfigurer.super.addResourceHandlers(registry);
 		registry.addResourceHandler("/**").addResourceLocations("/resources/");
-		registry.addResourceHandler("/**").addResourceLocations("/WEB-INF/views/");
+		registry.addResourceHandler("/*.html").addResourceLocations("/WEB-INF/views/");
 	}
 	
-	// MyBatis �ㅼ��
+	// MyBatis 설정
 	@Bean
 	public BasicDataSource dataSource() {
 		BasicDataSource source = new BasicDataSource();
