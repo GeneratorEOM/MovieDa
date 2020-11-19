@@ -66,12 +66,11 @@ module.exports = {
 그리고 Vue 포트는 8080 이고 Spring 은 8081 포트를 사용하기로 한다.  
 그러면 Vue 에서 localhost:8080/api 으로 url 요청을 보내면 Spring 서버 localhost:8081 로 돌려준다.  
 
-
-![리뷰쓰기_1](https://user-images.githubusercontent.com/64389409/99694474-d419f580-2acf-11eb-934a-5b3d06d0d05b.gif)
+![리뷰](https://user-images.githubusercontent.com/64389409/99698400-17766300-2ad4-11eb-954e-435eaa01e282.gif)
 ![회원수정_1](https://user-images.githubusercontent.com/64389409/99694481-d5e3b900-2acf-11eb-84ce-65918ce095bf.gif)
 ![글수정삭제](https://user-images.githubusercontent.com/64389409/99694484-d67c4f80-2acf-11eb-8813-fd292445a692.gif)
 ![글쓰기](https://user-images.githubusercontent.com/64389409/99694486-d714e600-2acf-11eb-9798-cc622b62940b.gif)
-![댓글](https://user-images.githubusercontent.com/64389409/99694488-d714e600-2acf-11eb-933b-a07b1627b1c3.gif)
+![댓글](https://user-images.githubusercontent.com/64389409/99697216-e0ec1880-2ad2-11eb-8989-95eabf1d12ea.gif)
 ![로그인 gif](https://user-images.githubusercontent.com/64389409/99694489-d7ad7c80-2acf-11eb-9e8b-95b32cf996e6.gif)
 ![회원가입](https://user-images.githubusercontent.com/64389409/99695177-9cf81400-2ad0-11eb-9fd4-e818e83dd0ad.gif)
 
