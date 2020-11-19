@@ -27,8 +27,8 @@ public class UserDAO {
 	public int modifyUserInfo(UserBean userBean) {
 		return userMapper.modifyUserInfo(userBean);
 	}
-	public int deleteUserInfo(String email) {
-		return userMapper.deleteUserInfo(email);
+	public int deleteUserInfo(int user_idx) {
+		return userMapper.deleteUserInfo(user_idx);
 	}
 
 }

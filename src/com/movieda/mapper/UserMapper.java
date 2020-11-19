@@ -30,13 +30,13 @@ public interface UserMapper {
 		String checkUserEmailExist(String email);
 	
 	@Update("UPDATE user "
-			+ "SET password = #{password}, name = #{name}, gender = #{gender} "
-			+ "WHERE email = #{email}")
+			+ "SET user_password = #{user_password}, user_name = #{user_name}, user_gender = #{user_gender} "
+			+ "WHERE user_email = #{user_email}")
 	int modifyUserInfo(UserBean userBean);
 
 	@Delete("DELETE "
 			+ "FROM user "
-			+ "WHERE email = #{email}")
-	int deleteUserInfo(String email);
+			+ "WHERE user_idx = #{user_idx}")
+	int deleteUserInfo(int user_idx);
 		
 }

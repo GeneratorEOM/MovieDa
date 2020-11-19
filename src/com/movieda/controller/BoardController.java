@@ -77,7 +77,6 @@ public class BoardController {
 
 	@DeleteMapping("/delete")
 	public void delete(@RequestParam(value = "board_idx") int board_idx) {
-		System.out.println("board_idx: " + board_idx);
 		boardService.deleteBoard(board_idx);
 	}
 	

@@ -32,7 +32,6 @@ public class BoardDAO {
 		boardMapper.modifyBoard(boardBean);
 	}
 	public void deleteBoard(int board_idx) {
-		System.out.println("bdao :"+board_idx);
 		boardMapper.deleteBoard(board_idx);
 	}
 	public int getContentCnt() {

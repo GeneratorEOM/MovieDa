@@ -7,6 +7,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    toggle: true,
+
     userInfo: null,
     isLogin: false,
     isLoginError: false,
@@ -29,6 +31,10 @@ export default new Vuex.Store({
 
   },
   mutations: {
+    // toggle
+    toggleAction(state) {
+      state.toggle = !state.toggle
+    },
     // 로그인이 성공했을 때
     loginSuccess(state, payload) {
       state.isLogin = true
@@ -99,6 +105,10 @@ export default new Vuex.Store({
 
   },
   actions: {
+    // toggle
+    toggleAction({commit}) {
+      commit("toggleAction")
+    },
     // 로그인 액션
     login({ commit }, loginObj) {
       
@@ -180,31 +190,33 @@ export default new Vuex.Store({
     // 회원가입 액션
     join({ commit }, joinObj) {
       let config = {
-        user_email: joinObj.email,
-        user_password: joinObj.password,
-        user_name: joinObj.name,
-        user_gender: joinObj.gender
+        user_email: joinObj.user_email,
+        user_password: joinObj.user_password,
+        user_name: joinObj.user_name,
+        user_gender: joinObj.user_gender
       }
       axios.post('http://localhost:8080/api/user/join', config)
         .then(res => {
-          if (res.data === 'true') router.push({ name: 'UserLogin' })
-          else commit('joinEmailError')
+          if (res.data === 1) router.push({ name: 'UserLogin' })
+          else if (res.data === -1)commit('joinEmailError')
+          else alert("가입 실패")
         })
         .catch(err => {
           console.log(err)
         })
     },
     // 회원정보 수정 액션
-    modifyUserInfo(context, modifyUserObj) {
+    modifyUserInfo({commit}, modifyUserObj) {
+       
       let config = {
-        user_email: modifyUserObj.email,
+        user_idx: modifyUserObj.idx,
         user_password: modifyUserObj.password,
         user_name: modifyUserObj.name,
         user_gender: modifyUserObj.gender
       }
       axios.put('http://localhost:8080/api/user/modify', config)
         .then(res => {
-          if (res.status === 200) router.push({ name: 'MovieList' })
+          if (res.status === 200) commit("toggleAction")
           else alert("수정 실패")
         })
         .catch(err => {
@@ -212,10 +224,11 @@ export default new Vuex.Store({
         })
     },
     // 회원정보 삭제 액션
-    deleteUserInfo({ dispatch }, deleteUserObj) {
-      axios.delete('http://localhost:8080/api/user/delete', { params: { email: deleteUserObj.email } })
+    deleteUserInfo({dispatch }, user_idx) {
+
+      axios.delete('http://localhost:8080/api/user/delete', { params: { user_idx: user_idx } })
         .then(res => {
-          if (res.data === 'true') dispatch('logout')
+          if (res.data === true) dispatch('logout')
           else alert("삭제 실패")
         })
         .catch(err => {
@@ -350,13 +363,15 @@ export default new Vuex.Store({
       })
     },
     // 게시판 글 삭제하기
-    deleteBoardInfo() {
+    deleteBoardInfo(context, board_idx) {
+      let c = confirm("삭제하시겠습니까?")
+      if(c === false) return false
       axios
       .delete("http://localhost:8080/api/board/delete", {
-        params: { board_idx: this.idx }
+        params: { board_idx: board_idx }
       })
       .then(res => {
-        if(res.status === 200) this.$router.push({name: 'BoardList'})
+        if(res.status === 200) router.push({name: 'BoardList'})
       })  
     },
     // 게시판 글 수정하기
@@ -407,7 +422,11 @@ export default new Vuex.Store({
       axios
         .post("http://localhost:8080/api/board/comment/write", config)
         .then(res => {
-          if (res.status === 200) dispatch('getCommentList', commentObj.comment_board_idx)
+          if (res.status === 200) {
+            dispatch('getCommentList', commentObj.board_idx)
+          }
+          
+
         })
     },
     // 댓글 수정하기
@@ -436,7 +455,6 @@ export default new Vuex.Store({
     },
     // 댓글 삭제
     deleteCommentInfo({dispatch}, comment) {
-      alert(comment.comment_board_idx)
       axios
         .delete("http://localhost:8080/api/board/comment/delete", {
           params: { comment_idx: comment.comment_idx }

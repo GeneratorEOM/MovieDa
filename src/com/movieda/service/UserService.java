@@ -21,22 +21,26 @@ public class UserService {
 	public UserBean getMyPageUserInfo(String token) {
 		return userDAO.getMyPageUserInfo(token);
 	}
-	public boolean addUserInfo(UserBean userBean) {
+	public int addUserInfo(UserBean userBean) {
 		// 아이디 중복 체크
 		boolean isEmailExist = checkUserEmailExist(userBean.getUser_email());
 		// 아이디 중복이므로 가입실패 - false
-		if(isEmailExist == true) return false;
+		if(isEmailExist == true) return -1;
+		
 		// 중복 아니므로 가입성공 - true
-		else return true;
+		int isAddSuccess = userDAO.addUserInfo(userBean);
+		if(isAddSuccess > 0) return 1;
+		else return 0;
+	
 	}
 	public boolean modifyUserInfo(UserBean userBean) {
-		int isupdateSuccess = userDAO.modifyUserInfo(userBean);
-		if(isupdateSuccess == 1) return true;
+		int isUpdateSuccess = userDAO.modifyUserInfo(userBean);
+		if(isUpdateSuccess > 0) return true;
 		else return false;
 	}
-	public boolean deleteUserInfo(String email) {
-		int isdeleteSuccess = userDAO.deleteUserInfo(email);
-		if(isdeleteSuccess == 1) return true;
+	public boolean deleteUserInfo(int user_idx) {
+		int isDeleteSuccess = userDAO.deleteUserInfo(user_idx);
+		if(isDeleteSuccess > 0) return true;
 		else return false;
 	}
 	

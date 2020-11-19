@@ -32,7 +32,7 @@ public class UserController {
 	}
 	
 	@PostMapping("/join")
-	public boolean user(@RequestBody UserBean userBean) {
+	public int user(@RequestBody UserBean userBean) {
 		return userService.addUserInfo(userBean);
 	}
 	
@@ -42,8 +42,8 @@ public class UserController {
 	}
 	
 	@DeleteMapping("/delete")
-	public boolean delete(@RequestParam("email") String email) {
-		return userService.deleteUserInfo(email);
+	public boolean delete(@RequestParam(name = "user_idx") int user_idx) {
+		return userService.deleteUserInfo(user_idx);
 	}
 	
 }

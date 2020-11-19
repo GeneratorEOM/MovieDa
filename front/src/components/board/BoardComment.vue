@@ -107,6 +107,8 @@ export default {
         })
         // 유효성 검사 메세지 초기
         this.$refs.form.resetValidation();
+        this.content = ""
+        
       }
     }
   }

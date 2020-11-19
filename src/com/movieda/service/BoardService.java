@@ -63,9 +63,6 @@ public class BoardService {
 	}
 
 	public int writeBoard(BoardBean boardBean) {
-		System.out.println("실행되냐");
-		
-
 		// 파일이 있으면
 		if (boardBean.getUpload_file() != null) {
 			// 파일 저장
@@ -75,11 +72,10 @@ public class BoardService {
 			boardBean.setBoard_file(file_name);
 		}
 		// write 성공 1 실패 0 반환
+		
 		int writeSuccess = boardDAO.writeBoard(boardBean);
-		if (writeSuccess == 1)
-			return 1;
-		else
-			return 0;
+		if (writeSuccess > 0) return 1;
+		else return 0;
 	}
 
 	public BoardBean detailBoard(int board_idx) {

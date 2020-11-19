@@ -3,9 +3,9 @@
     <v-layout>
       <v-flex>
         <v-form ref="form">
-          <v-text-field v-model="boardInfo.board_writer" label="이름" readonly></v-text-field>
+          <v-text-field v-model="boardInfo.board_writer" label="이름" readonly outlined filled></v-text-field>
 
-          <v-text-field class="mb-5" v-model="boardInfo.board_subject" label="제목" readonly></v-text-field>
+          <v-text-field class="mb-5" v-model="boardInfo.board_subject" label="제목" readonly outlined filled></v-text-field>
 
           <v-textarea
             outlined
@@ -14,12 +14,15 @@
             no-resize
             rows="10"
             readonly
+            filled          
           ></v-textarea>
           <v-layout>
           <v-flex xs9>
-            <v-file-input class="mr-3" :label="boardInfo.board_file == null ? '파일 없음' : boardInfo.board_file" outlined dense disabled></v-file-input>
+            <v-file-input class="mr-3" :label="boardInfo.board_file == null ? '파일 없음' : boardInfo.board_file" filled 
+            outlined dense disabled></v-file-input>
           </v-flex>
-          <v-flex xs3> 
+          
+          <v-flex xs3 v-if="boardInfo.board_file != null"> 
             <v-btn @click="fileDown">다운로드</v-btn>
           </v-flex>
           </v-layout>
@@ -37,7 +40,6 @@
     </v-layout>
 
       <BoardComment :idx="board_idx" :show="show"/>
-
   </v-container>
 </template>
 
@@ -51,7 +53,8 @@ export default {
   data() {
     return {
       board_idx: Number(this.$route.params.idx),
-      show: false
+      show: false,
+      length: 0
     };
   },
   computed: {
@@ -70,7 +73,7 @@ export default {
     });
   },
   fileDown() {
-    location.href="http://localhost:8080/api/board/fileDown?file_name="+this.board.board_file
+    location.href="http://localhost:8080/api/board/fileDown?file_name="+this.boardInfo.board_file
   },
   toggle() {
     this.show = !this.show
