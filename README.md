@@ -293,10 +293,7 @@ axios
       "vote_average": 8.1,
       "overview": "우리 핑핑이가 어디로 갔을까? 설마, 납치당한 건가? 사랑하는 반려 달팽이를 찾아 떠나는 스폰지밥. 뚱이도 함께 가야지. 비키니 시티를 벗어나 미지의 세계로, 출발이다!",
       "release_date": "2020-08-14"
-    },
-    
-    ...
-    
+    }
 }
 ```
   
@@ -338,14 +335,69 @@ int writeBoard(BoardBean boardBean);
 ```
 ![글쓰기](https://user-images.githubusercontent.com/64389409/99694486-d714e600-2acf-11eb-9798-cc622b62940b.gif)
 
+### 글수정 및 삭제
+    
+```js
+// 게시판 글 수정하기
+// 수정 내용을 폼 객체로 전송 multipart/form-data
+var data = new FormData();
+ config.append("board_idx", idx);
+ config.append("board_subject", subject);
+ config.append("board_content",content);
+ config.append("upload_file", file);
+axios
+.put("http://localhost:8080/api/board/modify", data, {
+   headers: { "Content-Type": "multipart/form-data" }
+})
+.then(res => {})
+.catch(err => {})
 
+// 삭제
+axios
+.delete("http://localhost:8080/api/board/delete", { params: { board_idx: board_idx } })
+.then(res => {})  
+.catch(err => {})  
+```
+  
+```java
+// controller
+// 수정
+@PutMapping("/api/board/modify")
+public void modify(BoardBean boardBean) {
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.
+	boardService.modifyBoard(boardBean);
+}
+
+// 삭제
+@DeleteMapping("/api/board//delete")
+public void delete(@RequestParam(value = "board_idx") int board_idx) {
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.
+	boardService.deleteBoard(board_idx);
+}
+```
+  
+```java
+// mapper sql
+// 수정
+@Update("UPDATE board SET board_subject = #{board_subject}, "
+	+ "board_content = #{board_content}, board_file = #{board_file} "
+	+ "WHERE board_idx = #{board_idx}")
+void modifyBoard(BoardBean boardBean);
+
+// 삭제
+@Delete("DELETE "
+	+ "FROM board "
+	+ "WHERE board_idx = #{board_idx}")
+void deleteBoard(int board_idx);
+```
+![글수정삭제](https://user-images.githubusercontent.com/64389409/99694484-d67c4f80-2acf-11eb-8813-fd292445a692.gif)
 
 <img src="https://user-images.githubusercontent.com/64389409/99762893-de260d80-2b3c-11eb-8c2d-5cecc4dbe34e.gif" width="56%">
 
 <img src="https://user-images.githubusercontent.com/64389409/99762897-dfefd100-2b3c-11eb-9f86-99d355d730cc.gif" width="56%">
   
 
-![글수정삭제](https://user-images.githubusercontent.com/64389409/99694484-d67c4f80-2acf-11eb-8813-fd292445a692.gif)
+
 
 
 
