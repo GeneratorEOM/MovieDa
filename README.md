@@ -50,7 +50,12 @@ Vue 와 Spring 은 서버가 다르기 때문에 포트도 두개로 나뉜다.
   
 ```vue.js
 // vue.config.js
+
+const path = require('path')
+
 module.exports = {  
+	outputDir: path.resolve(__dirname, "../"+"/WebContent/resources"),
+	indexPath: path.resolve(__dirname, "../"+"/WebContent/WEB-INF/views/index.html"),
   devServer: {
 	  proxy: {
 		  '/api': {
@@ -60,21 +65,153 @@ module.exports = {
 		  },
 	  }
   }
+
+```
+  
+먼저 front 폴더 아래에 vue.config.js 를 만들어준다.  
+outputDir 는 vue 빌드 되는 경로고 indexPath 는 index.html 이 만들어진 경로다.   
+그리고 Vue 포트는 8080 이고 Spring 은 8081 포트를 사용하기로 한다.  
+그러면 Vue 에서 localhost:8080/api 으로 url 요청을 보내면 Spring 서버 localhost:8081 로 돌려준다. 
+
+## 핵심 기능
+  
+### 회원가입
+  
+Vue
+  
+```js
+// 회원가입 처리
+// 입력받는 가입정보를 가지고 axios.post 요청
+  let data = {
+    email, password, name, gender
+  }
+  axios.post('http://localhost:8080/api/user/join', data)
+  .then(res => {})
+  .catch(err => {})
+```
+  
+Spring
+  
+```java
+// controller
+@PostMapping("/api/user/join")
+public int user(@RequestBody UserBean userBean) {
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.	
+	// 서비스단에서 중복 체크까지
+	return userService.addUserInfo(userBean);
 }
 ```
-먼저 front 폴더 아래에 vue.config.js 를 만들어준다.  
-그리고 Vue 포트는 8080 이고 Spring 은 8081 포트를 사용하기로 한다.  
-그러면 Vue 에서 localhost:8080/api 으로 url 요청을 보내면 Spring 서버 localhost:8081 로 돌려준다.  
+  
+```java
+// service
+public int addUserInfo(UserBean userBean) {
+	// 아이디 중복 체크
+	boolean isEmailExist = checkUserEmailExist(userBean.getUser_email());
+	// 아이디 중복이므로 가입실패 - false
+	if(isEmailExist == true) return -1;
+	// INSERT 성공하면 1
+	int isAddSuccess = userDAO.addUserInfo(userBean);
+	if(isAddSuccess > 0) return 1;
+	else return 0;
+}
+```
+```java
+// mapper sql
+@Insert("INSERT INTO user(user_email, user_password, user_name, user_gender, user_date) "
+	+ "values(#{user_email}, #{user_password}, #{user_name}, #{user_gender}, now())")
+int addUserInfo(UserBean userBean);
+	
+@Select("SELECT user_email "
+	+ "FROM user "
+	+ "WHERE user_email = #{user_email}")
+String checkUserEmailExist(String email);
+```
+
+
+![회원가입](https://user-images.githubusercontent.com/64389409/99695177-9cf81400-2ad0-11eb-9fd4-e818e83dd0ad.gif)
+  
+### 로그인
+
+Vue
+  
+```js
+// 로그인 액션 처리
+let data = { email, password }
+axios.post('http://localhost:8080/api/user/login', data)
+// 세션에 로그인 처리르 위해 토큰 저장
+// 일반적으로 토큰을 받아와서 로컬에 저장하고 유효한지 확인하는 방식으로 로그인 처리를 하는듯 JWT???
+// 나중에 해보도록 하고 그냥 토큰이 있는지 없는지만 확인하도록 저장
+.then(res => { sessionStorage.setItem("token", res.data) }) 
+.catch(err => {})
+```
+  
+Spring
+  
+```java
+// controller
+@PostMapping("/api/user/login")
+public UserBean login(@RequestBody UserBean userBean) {	
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.
+	// 리턴데이터가 없으면 아이디비번이 일치하지 않음
+	return userService.getLoginUserInfo(userBean);
+}
+```
+```java
+// mapper sql
+@Select("SELECT * "
+	+ "FROM user "
+	+ "WHERE user_email = #{user_email} and user_password = #{user_password}")
+UserBean getLoginUserInfo(UserBean userBean);
+```
+
+  
+![로그인 gif](https://user-images.githubusercontent.com/64389409/99694489-d7ad7c80-2acf-11eb-9e8b-95b32cf996e6.gif) 
+  
+### 회원수정
+    
+Vue
+```js
+// 회원정보 수정 처리
+modifyUserInfo({commit}, modifyUserObj) {
+       
+let data = { idx, password, modify_name, modify_gender }
+      axios.put('http://localhost:8080/api/user/modify', data)
+      .then(res => {})
+      .catch(err => {})
+```
+  
+Spring
+  
+```java
+// controller
+@PutMapping("/api/user/modify")
+public boolean modify(@RequestBody UserBean userBean) {
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.
+	return userService.modifyUserInfo(userBean);
+}
+```
+  
+```java
+// mapper sql
+@Update("UPDATE user "
+	+ "SET user_password = #{user_password}, user_name = #{user_name}, user_gender = #{user_gender} "
+	+ "WHERE user_email = #{user_email}")
+int modifyUserInfo(UserBean userBean);
+```
+
+![회원수정_1](https://user-images.githubusercontent.com/64389409/99694481-d5e3b900-2acf-11eb-84ce-65918ce095bf.gif)
+
+
 
 <img src="https://user-images.githubusercontent.com/64389409/99762893-de260d80-2b3c-11eb-8c2d-5cecc4dbe34e.gif" width="56%">
 
 <img src="https://user-images.githubusercontent.com/64389409/99762897-dfefd100-2b3c-11eb-9f86-99d355d730cc.gif" width="56%">
   
-![회원수정_1](https://user-images.githubusercontent.com/64389409/99694481-d5e3b900-2acf-11eb-84ce-65918ce095bf.gif)
+
 ![글수정삭제](https://user-images.githubusercontent.com/64389409/99694484-d67c4f80-2acf-11eb-8813-fd292445a692.gif)
 ![글쓰기](https://user-images.githubusercontent.com/64389409/99694486-d714e600-2acf-11eb-9798-cc622b62940b.gif)
-![로그인 gif](https://user-images.githubusercontent.com/64389409/99694489-d7ad7c80-2acf-11eb-9e8b-95b32cf996e6.gif)
-![회원가입](https://user-images.githubusercontent.com/64389409/99695177-9cf81400-2ad0-11eb-9fd4-e818e83dd0ad.gif)
+
+
 
   
 
