@@ -167,36 +167,55 @@ UserBean getLoginUserInfo(UserBean userBean);
   
 ![로그인 gif](https://user-images.githubusercontent.com/64389409/99694489-d7ad7c80-2acf-11eb-9e8b-95b32cf996e6.gif) 
   
-### 회원수정
+### 회원수정 및 삭제
     
 Vue
 ```js
 // 회원정보 수정 처리
-modifyUserInfo({commit}, modifyUserObj) {
-       
+// 회원정보의 비밀번호랑 입력한 비밀번호가 일치하면 axios.put 요청      
 let data = { idx, password, modify_name, modify_gender }
       axios.put('http://localhost:8080/api/user/modify', data)
       .then(res => {})
       .catch(err => {})
+      
+// 회원정보 삭제 처리
+// 회원정보의 비밀번호랑 입력한 비밀번호가 일치하면 axios.delete 요청      
+axios.delete('http://localhost:8080/api/user/delete', { params: { user_idx: user_idx } })
+.then(res => {})
+.catch(err => {})
 ```
   
 Spring
   
 ```java
 // controller
+// 수정
 @PutMapping("/api/user/modify")
 public boolean modify(@RequestBody UserBean userBean) {
 	// service -> DAO -> Mapper 순으로 요청을 처리한다.
 	return userService.modifyUserInfo(userBean);
 }
+
+// 삭제
+@DeleteMapping("/delete")
+public boolean delete(@RequestParam(name = "user_idx") int user_idx) {
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.
+	return userService.deleteUserInfo(user_idx);
+}
 ```
   
 ```java
-// mapper sql
+// 수정 mapper sql
 @Update("UPDATE user "
 	+ "SET user_password = #{user_password}, user_name = #{user_name}, user_gender = #{user_gender} "
 	+ "WHERE user_email = #{user_email}")
 int modifyUserInfo(UserBean userBean);
+
+// 삭제 mapper sql
+@Delete("DELETE "
+	+ "FROM user "
+	+ "WHERE user_idx = #{user_idx}")
+int deleteUserInfo(int user_idx);
 ```
 
 ![회원수정_1](https://user-images.githubusercontent.com/64389409/99694481-d5e3b900-2acf-11eb-84ce-65918ce095bf.gif)
