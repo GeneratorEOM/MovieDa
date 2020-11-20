@@ -220,6 +220,124 @@ int deleteUserInfo(int user_idx);
 
 ![회원수정_1](https://user-images.githubusercontent.com/64389409/99694481-d5e3b900-2acf-11eb-84ce-65918ce095bf.gif)
 
+### TMDB API 영화 리스트 가져오기
+
+[TMDB](https://www.themoviedb.org/) 에서 회원가입하고 API 키를 받는다.
+  
+[DOCS](https://developers.themoviedb.org/3/getting-started/introduction) 여기서 영화 정보를 JSON 형태로 가져올 수 있다. URL도 만들어준다. 정말 쉽다!
+  
+```js
+// 한글 인기순으로 가져오는 쿼리다.
+// pageNum 에 페이지번호를 넣으면 20개씩 가져온다.
+axios
+.get("https://api.themoviedb.org/3/discover/movie?api_key=발급받은API키"
+    +"&language=ko-KR"
+    +"&sort_by=popularity.desc"
+    +"&include_adult=false
+    +"&include_video=false
+    +"&page=" 
+    + pageNum )
+.then(res => {
+    
+ });
+```
+  
+응답결과를 가지고 입맛대로 리스트를 구현할 수 있다.
+리스트에는 Spring 과의 통신이 따로 없다.
+  
+```json
+{
+  "page": 1,
+  "total_results": 10000,
+  "total_pages": 500,
+  "results": [
+    {
+      "popularity": 1307.787,
+      "vote_count": 209,
+      "video": false,
+      "poster_path": "/hSpm2mMbkd0hLTRWBz0zolnLAyK.jpg",
+      "id": 671039,
+      "adult": false,
+      "backdrop_path": "/gnf4Cb2rms69QbCnGFJyqwBWsxv.jpg",
+      "original_language": "fr",
+      "original_title": "Bronx",
+      "genre_ids": [
+        53,
+        28,
+        18,
+        80
+      ],
+      "title": "로그 시티",
+      "vote_average": 6,
+      "overview": "부패경찰과 마르세유의 조폭 사이의 문제로 위기의  경찰조직을 보호해야 한다.",
+      "release_date": "2020-10-30"
+    },
+    {
+      "popularity": 1232.799,
+      "vote_count": 1416,
+      "video": false,
+      "poster_path": "/jcJpkQWRU8gsZlo830eQ8ryXKNU.jpg",
+      "id": 400160,
+      "adult": false,
+      "backdrop_path": "/wu1uilmhM4TdluKi2ytfz8gidHf.jpg",
+      "original_language": "en",
+      "original_title": "The SpongeBob Movie: Sponge on the Run",
+      "genre_ids": [
+        14,
+        16,
+        12,
+        35,
+        10751
+      ],
+      "title": "스폰지밥 무비: 핑핑이 구출 대작전",
+      "vote_average": 8.1,
+      "overview": "우리 핑핑이가 어디로 갔을까? 설마, 납치당한 건가? 사랑하는 반려 달팽이를 찾아 떠나는 스폰지밥. 뚱이도 함께 가야지. 비키니 시티를 벗어나 미지의 세계로, 출발이다!",
+      "release_date": "2020-08-14"
+    },
+    
+    ...
+    
+}
+```
+  
+<img src="https://user-images.githubusercontent.com/64389409/99777896-4b926800-2b56-11eb-9adc-a08545328217.gif" width="56%">
+
+  
+### 글쓰기
+  
+Vue
+```js
+// 파일처리를 위한 Content-Type: multipart/form-data
+var data = new FormData();
+  data.append("board_user_idx", idx);
+  data.append("board_subject", subject);
+  data.append("board_content", content);
+  data.append("upload_file", file);
+axios
+.post("http://localhost:8080/api/board/write", data, {
+ headers: { "Content-Type": "multipart/form-data" }
+})
+.then(res => {})
+.catch(err => {});
+```
+```java
+// controller
+@PostMapping("/api/board/write")
+public int write(BoardBean boardBean) {	
+	// service -> DAO -> Mapper 순으로 요청을 처리한다.
+	return boardService.writeBoard(boardBean);
+}
+```
+```java
+// mapper sql
+@Insert("INSERT INTO board(board_idx, board_subject, board_content, "
+	+ "board_file, board_date, board_user_idx) "
+	+ "VALUES(null, #{board_subject}, #{board_content}, #{board_file}, "
+	+ "now(), #{board_user_idx})")
+int writeBoard(BoardBean boardBean);
+```
+![글쓰기](https://user-images.githubusercontent.com/64389409/99694486-d714e600-2acf-11eb-9798-cc622b62940b.gif)
+
 
 
 <img src="https://user-images.githubusercontent.com/64389409/99762893-de260d80-2b3c-11eb-8c2d-5cecc4dbe34e.gif" width="56%">
@@ -228,7 +346,7 @@ int deleteUserInfo(int user_idx);
   
 
 ![글수정삭제](https://user-images.githubusercontent.com/64389409/99694484-d67c4f80-2acf-11eb-8813-fd292445a692.gif)
-![글쓰기](https://user-images.githubusercontent.com/64389409/99694486-d714e600-2acf-11eb-9798-cc622b62940b.gif)
+
 
 
 
