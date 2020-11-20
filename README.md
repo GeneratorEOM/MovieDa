@@ -293,11 +293,12 @@ axios
       "vote_average": 8.1,
       "overview": "우리 핑핑이가 어디로 갔을까? 설마, 납치당한 건가? 사랑하는 반려 달팽이를 찾아 떠나는 스폰지밥. 뚱이도 함께 가야지. 비키니 시티를 벗어나 미지의 세계로, 출발이다!",
       "release_date": "2020-08-14"
-    }
 }
+
 ```
   
 <img src="https://user-images.githubusercontent.com/64389409/99777896-4b926800-2b56-11eb-9adc-a08545328217.gif" width="56%">
+
 
   
 ### 글쓰기
@@ -392,9 +393,92 @@ void deleteBoard(int board_idx);
 ```
 ![글수정삭제](https://user-images.githubusercontent.com/64389409/99694484-d67c4f80-2acf-11eb-8813-fd292445a692.gif)
 
+### 댓글수정 및 삭제
+
+기본적인 수정과 삭제는 게시판 글과 같다.  
+다른점은 여러개의 댓글에서 하나를 선택해서 수정할 수 있어야하기 때문에   
+각각의 댓글에 폼을 토글할 수 있는 active 와 수정할 content 를 map 으로 추가한다.  
+```js
+axios
+.get("http://localhost:8080/api/board/comment/list", { params: { board_idx: board_idx } })
+.then(comments => {
+	// active 와 modifyConent 를 추가한다.
+	comments = comments.map(comment => ({
+	...comment,
+	// 수정 폼 액티브
+	isActive: false,
+	// 수정 내용
+	modifyContent : ""
+}));
+})  
+.catch(res => {})  
+```
+```js
+```
+```json
+[
+  {
+	"comment_idx": 1,
+	"comment_content": "내용",
+	"isActive": false,
+	"modifyContent" : "수정내용"
+	
+  },
+  {
+	"comment_idx": 2,
+	"comment_content": "내용",	
+	"isActive": false,
+	"modifyContent" : "수정내용"
+  }
+]
+```
 <img src="https://user-images.githubusercontent.com/64389409/99762893-de260d80-2b3c-11eb-8c2d-5cecc4dbe34e.gif" width="56%">
 
+### 영화 한줄평
+
+기본적인 쓰기, 수정, 삭제는 게시판 글과 같다.
+여기서도 수정을 위해 댓글과 같이 map 을 사용한다.
+```js
+axios
+.get("http://localhost:8080/api/movie/review/list", { params: { review_idx: review_idx } })
+.then(reviews => {
+	// active 와 modifyConent 를 추가한다.
+	reviews = reviews.map(review => ({
+	...review,
+	// 수정 폼 액티브
+	isActive: false,
+	// 수정 내용
+	modifyContent : "",
+	// 수정 별점
+	modifyRating: 3,
+}));
+})  
+.catch(res => {})  
+```
+```js
+```
+```json
+[
+  {
+	"review_idx": 1,
+	"review_content": "내용",
+	"isActive": false,
+	"modifyContent": "수정내용",
+	"modifyRating": 3
+	
+  },
+  {
+	"review_idx": 2,
+	"review_content": "내용",	
+	"isActive": false,
+	"modifyContent" : "수정내용",
+	"modifyRating": 3
+  }
+]
+```
 <img src="https://user-images.githubusercontent.com/64389409/99762897-dfefd100-2b3c-11eb-9f86-99d355d730cc.gif" width="56%">
+
+
   
 
 
