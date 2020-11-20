@@ -78,7 +78,6 @@ outputDir 는 vue 빌드 되는 경로고 indexPath 는 index.html 이 만들어
 ### 회원가입
   
 Vue
-  
 ```js
 // 회원가입 처리
 // 입력받는 가입정보를 가지고 axios.post 요청
@@ -91,7 +90,6 @@ Vue
 ```
   
 Spring
-  
 ```java
 // controller
 @PostMapping("/api/user/join")
@@ -132,8 +130,7 @@ String checkUserEmailExist(String email);
   
 ### 로그인
 
-Vue
-  
+Vue 
 ```js
 // 로그인 액션 처리
 let data = { email, password }
@@ -187,7 +184,6 @@ const routes = [
 ```
   
 Spring
-  
 ```java
 // controller
 @PostMapping("/api/user/login")
@@ -226,8 +222,7 @@ axios.delete('http://localhost:8080/api/user/delete', { params: { user_idx: user
 .catch(err => {})
 ```
   
-Spring
-  
+Spring 
 ```java
 // controller
 // 수정
@@ -266,6 +261,8 @@ int deleteUserInfo(int user_idx);
 [TMDB](https://www.themoviedb.org/) 에서 회원가입하고 API 키를 받는다.
   
 [DOCS](https://developers.themoviedb.org/3/getting-started/introduction) 여기서 영화 정보를 JSON 형태로 가져올 수 있다. URL도 만들어준다. 정말 쉽다!
+
+Vue
   
 ```js
 // 한글 인기순으로 가져오는 쿼리다.
@@ -285,6 +282,8 @@ axios
   
 응답결과를 가지고 입맛대로 리스트를 구현할 수 있다.
 리스트에는 Spring 과의 통신이 따로 없다.
+  
+TMDB Server
   
 ```json
 {
@@ -367,6 +366,8 @@ public int write(BoardBean boardBean) {
 	return boardService.writeBoard(boardBean);
 }
 ```
+  
+Spring
 ```java
 // mapper sql
 @Insert("INSERT INTO board(board_idx, board_subject, board_content, "
@@ -378,7 +379,8 @@ int writeBoard(BoardBean boardBean);
 ![글쓰기](https://user-images.githubusercontent.com/64389409/99694486-d714e600-2acf-11eb-9798-cc622b62940b.gif)
 
 ### 글수정 및 삭제
-    
+      
+Vue
 ```js
 // 게시판 글 수정하기
 // 수정 내용을 폼 객체로 전송 multipart/form-data
@@ -401,6 +403,7 @@ axios
 .catch(err => {})  
 ```
   
+Spring 
 ```java
 // controller
 // 수정
@@ -439,6 +442,8 @@ void deleteBoard(int board_idx);
 기본적인 수정과 삭제는 게시판 글과 같다.  
 다른점은 여러개의 댓글에서 하나를 선택해서 수정할 수 있어야하기 때문에   
 각각의 댓글에 폼을 토글할 수 있는 active 와 수정할 content 를 map 으로 추가한다.  
+  
+Vue
 ```js
 // 댓글 리스트 가져오기
 axios
@@ -480,6 +485,8 @@ axios
 
 기본적인 쓰기, 수정, 삭제는 게시판 글과 같다.
 여기서도 수정을 위해 댓글과 같이 map 을 사용한다.
+  
+Vue
 ```js
 // 리뷰 리스트 가져오기
 axios
