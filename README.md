@@ -145,6 +145,47 @@ axios.post('http://localhost:8080/api/user/login', data)
 .catch(err => {})
 ```
   
+라우터 가드를 사용해서 접근권한을 체크했다.
+  
+```js
+// router index.js
+const rejectAuthUser = (to, from, next) => {
+  if(store.state.isLogin === true) {
+    // 이미 로그인 된 유저
+    alert("이미 로그인 하셨습니다")
+    next("/")
+  }else {
+    next()
+  }
+}
+const onlyAuthUser = (to, from, next) => {
+  if(store.state.isLogin === false) {
+    // 로그인 되지 않은 유저
+    alert("로그인이 필요합니다")
+    next("/")
+  }else {
+    next()
+  }
+}
+
+const routes = [
+  {
+    // beforeEnter : rejectAuthUser 로 인하여 이미 로그인한 유저는 로그인 페이지로 접근할 수 없을 것이다.
+    path: '/user/login',
+    name: 'UserLogin',
+    beforeEnter: rejectAuthUser,
+    component: () => import(/* webpackChunkName: "about" */ '../views/user/UserLogin.vue')
+  },
+  {
+    // beforeEnter : onlyAuthUser 로 인하여 로그인 하지 않은 사용자는 글쓰기 페이지로 접근할 수 없을 것이다.
+    path: '/board/write',
+    name: 'BoardWrite',
+    beforeEnter: onlyAuthUser,
+    component: () => import(/* webpackChunkName: "about" */ '../views/board/BoardWrite.vue')
+  }
+]
+```
+  
 Spring
   
 ```java
@@ -399,6 +440,7 @@ void deleteBoard(int board_idx);
 다른점은 여러개의 댓글에서 하나를 선택해서 수정할 수 있어야하기 때문에   
 각각의 댓글에 폼을 토글할 수 있는 active 와 수정할 content 를 map 으로 추가한다.  
 ```js
+// 댓글 리스트 가져오기
 axios
 .get("http://localhost:8080/api/board/comment/list", { params: { board_idx: board_idx } })
 .then(comments => {
@@ -439,6 +481,7 @@ axios
 기본적인 쓰기, 수정, 삭제는 게시판 글과 같다.
 여기서도 수정을 위해 댓글과 같이 map 을 사용한다.
 ```js
+// 리뷰 리스트 가져오기
 axios
 .get("http://localhost:8080/api/movie/review/list", { params: { review_idx: review_idx } })
 .then(reviews => {
