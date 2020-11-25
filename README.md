@@ -1,6 +1,6 @@
 # MovieDa
 > 영화 리뷰 사이트  
-> [유투브로 보기](https://www.youtube.com/watch?v=_F7an-fuHSo)
+> [유튜브로 보기](https://www.youtube.com/watch?v=_F7an-fuHSo)
   
 ## 개발 환경
 **Front-end**
