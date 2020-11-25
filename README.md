@@ -1,5 +1,6 @@
 # MovieDa
 > 영화 리뷰 사이트
+> [유투브로 보기](https://www.youtube.com/watch?v=_F7an-fuHSo)
   
 ## 개발 환경
 **Front-end**
@@ -15,7 +16,7 @@
 **Tools**
   * Eclipse (Spring Framework 5.0)
   * apache/tomcat9.0
-  * SQL developer
+  * MySQL Workbench
     
 **SCM**
   * Github
@@ -235,7 +236,7 @@ public boolean modify(@RequestBody UserBean userBean) {
 }
 
 // 삭제
-@DeleteMapping("/delete")
+@DeleteMapping("/api/user/delete")
 public boolean delete(@RequestParam(name = "user_idx") int user_idx) {
 	// service -> DAO -> Mapper 순으로 요청을 처리한다.
 	return userService.deleteUserInfo(user_idx);
